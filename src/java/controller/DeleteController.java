@@ -7,35 +7,34 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import userDB.UserDAO;
+import model.MobileDAO;
 
-@WebServlet(name = "DeleteController", urlPatterns = { "/DeleteController" })
+@WebServlet("/DeleteController")
 public class DeleteController extends HttpServlet {
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Delete user and turnback to listController
-        try {
-            String userID = request.getParameter("userID");
-            UserDAO dao = new UserDAO();
-            dao.delete(userID);
-            request.getRequestDispatcher("listController").forward(request, response);
-        } catch (Exception e) {
-            log("Error at DeleteController: " + e.toString());
-        } finally {
-            request.getRequestDispatcher("listController").forward(request, response);
-        }
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
-    }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+        // Kiểm tra session
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("role") == null || !session.getAttribute("role").equals("2")) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        String mobileId = request.getParameter("mobileId");
+        MobileDAO dao = new MobileDAO();
+        boolean isDeleted = dao.deleteMobile(mobileId);
+
+        if (isDeleted) {
+            // Xóa thành công
+            response.sendRedirect("staff.jsp");
+        } else {
+            // Xóa thất bại, có thể do lỗi hoặc sản phẩm không tồn tại
+            request.setAttribute("errorMessage", "Xóa sản phẩm thất bại.");
+            request.getRequestDispatcher("staff.jsp").forward(request, response);
+        }
     }
 }

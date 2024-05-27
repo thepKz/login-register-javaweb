@@ -37,8 +37,8 @@
                     <a href="register.jsp">Forget Password</a>
                 </div>
                 <div class="error-message">
-                    <% if (request.getAttribute("fail") != null) { %>
-                        Error: <%= request.getAttribute("fail") %><br/>
+                    <% if (request.getAttribute("errorMessage") != null) { %>
+                        Error: <%= request.getAttribute("errorMessage") %><br/>
                     <% } %>
                 </div>
                 <button name="action" value="Login">Login</button>

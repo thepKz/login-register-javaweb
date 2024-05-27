@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import userDB.UserDAO;
-import userDB.UserDTO;
-import userDB.UserError;
+import model.UserDAO;
+import model.UserDTO;
+import model.UserError;
 
 /**
  *
@@ -47,16 +47,16 @@ public class RegisterController extends HttpServlet {
 
             String userID = request.getParameter("userID");
             String fullName = request.getParameter("fullName");
-            String roleID = request.getParameter("roleID");
+            String role = request.getParameter("role");
             String password = request.getParameter("password");
-            System.out.println(userID + fullName + roleID + password);
+            System.out.println(userID + fullName + role + password);
             if (dao.checkUserNameExists(userID)) {
                 System.out.println("Check Exist");
                 userError.setUserID("User ID already exists!");
                 request.setAttribute("USER_ERROR", userError);
             } else {
                 System.out.println("Check Exist FALSE");
-                UserDTO user = new UserDTO(userID, fullName, roleID, password);
+                UserDTO user = new UserDTO(userID, fullName, role, password);
                 boolean checkInsert = dao.insertV2(user);
                 System.out.println(checkInsert);
                 if (checkInsert) {

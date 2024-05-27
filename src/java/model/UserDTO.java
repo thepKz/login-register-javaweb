@@ -3,33 +3,28 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package userDB;
+package model;
 
 /**
  *
  * @author hd
  */
-public class UserError {
+public class UserDTO {
     private String userID;
     private String fullName;
     private String roleID;
     private String password;
-    private String confirm;
+    public static String USER_ROLE = "0";
+    public static String STAFF_ROLE = "2";
 
-    public UserError() {
-        this.userID = "";
-        this.fullName = "";
-        this.roleID = "";
-        this.password = "";
-        this.confirm = "";
+    public UserDTO() {
     }
 
-    public UserError(String userID, String fullName, String roleID, String password, String confirm) {
+    public UserDTO(String userID, String fullName, String roleID, String password) {
         this.userID = userID;
         this.fullName = fullName;
         this.roleID = roleID;
         this.password = password;
-        this.confirm = confirm;
     }
 
     public String getUserID() {
@@ -64,12 +59,4 @@ public class UserError {
         this.password = password;
     }
 
-    public String getConfirm() {
-        return confirm;
-    }
-
-    public void setConfirm(String confirm) {
-        this.confirm = confirm;
-    }
-    
 }

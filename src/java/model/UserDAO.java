@@ -1,9 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package userDB;
+
+package model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,12 +15,12 @@ import utils.DBUtils;
  * @author hd
  */
 public class UserDAO {
-    private static final String LOGIN = "SELECT fullName, roleID FROM tblUsers WHERE userID=? AND password=? ";
-    private static final String SEARCH = "SELECT userID, fullName, roleID FROM tblUsers WHERE fullName like ?";
-    private static final String DELETE = "DELETE tblUsers WHERE userID=?";
-    private static final String UPDATE = "UPDATE tblUsers SET fullName=?, roleID=? WHERE userID=?";
-    private static final String CHECK_DUPLICATE = "SELECT userID FROM tblUsers WHERE userID=?  ";
-    private static final String INSERT = "INSERT INTO tblUsers(userId, fullName, roleID, password) "
+    private static final String LOGIN = "SELECT fullName, role FROM tbl_User WHERE userID=? AND password=? ";
+    private static final String SEARCH = "SELECT userID, fullName, role FROM tbl_User WHERE fullName like ?";
+    private static final String DELETE = "DELETE tbl_User WHERE userID=?";
+    private static final String UPDATE = "UPDATE tbl_User SET fullName=?, role=? WHERE userID=?";
+    private static final String CHECK_DUPLICATE = "SELECT userID FROM tbl_User WHERE userID=?  ";
+    private static final String INSERT = "INSERT INTO tbl_User(userId, fullName, role, password) "
             + "                         VALUES(?,?,?,?)";
 
     public UserDTO checkLogin(String userID, String password) throws SQLException {
@@ -41,8 +37,8 @@ public class UserDAO {
                 rs = ptm.executeQuery();
                 if (rs.next()) {
                     String fullName = rs.getString("fullName");
-                    String roleID = rs.getString("roleID");
-                    user = new UserDTO(userID, fullName, roleID, "***");
+                    String role = rs.getString("role");
+                    user = new UserDTO(userID, fullName, role, "***");
                 }
             }
         } catch (Exception e) {
@@ -100,9 +96,9 @@ public class UserDAO {
                 while (rs.next()) {
                     String userID = rs.getString("userID");
                     String fullName = rs.getString("fullName");
-                    String roleID = rs.getString("roleID");
+                    String role = rs.getString("role");
                     String password = "***";
-                    list.add(new UserDTO(userID, fullName, roleID, password));
+                    list.add(new UserDTO(userID, fullName, role, password));
                 }
             }
         } catch (Exception e) {

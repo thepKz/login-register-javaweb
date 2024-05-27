@@ -42,7 +42,7 @@
             <form action="MainController" method="post" onsubmit="return validateForm()">
                 <h1>Register</h1>
                 <div class="error-message">
-                    <%@page import="userDB.UserError"%>
+                    <%@page import="model.UserError"%>
                     <% if (request.getAttribute("USER_ERROR") != null) {
                         UserError userError = (UserError) request.getAttribute("USER_ERROR");
                     %>
@@ -56,10 +56,21 @@
                 </div>
                 <div class="inputbox">
                     <ion-icon name="text-outline"></ion-icon>
-                    <input type="text" id="fullName" name="fullName" required onchange="validateForm()">
+                    <input type="text" id="fullName" name="fullName" required>
                     <label for="fullName">Full Name</label>
                 </div>
-                <input type="hidden" id="roleID" name="roleID" value="US">
+                <div class="inputbox" style="display:flex!important;flex-direction: row!important;">
+                    <div class="radio-option" style="position: relative!important;">
+                   
+                        <input type="radio" id="user" name="role" value="0" checked required style="position: relative!important;height:20px!important; width: 20px!important;">
+                        <label for="user" style="position: relative!important;">User</label>
+                    </div>
+                    <div class="radio-option" style="position: relative!important;">
+          
+                        <input type="radio" id="staff" name="role" value="2" required style="position: relative!important;margin-left : 10px!important;height:20px!important; width: 20px!important;">
+                        <label for="staff" style="position: relative!important;">Staff</label>
+                    </div>
+                    </div>
                 <div class="inputbox">
                     <ion-icon name="lock-closed-outline"></ion-icon>
                     <input type="password" id="password" name="password" required onchange="validateForm()">

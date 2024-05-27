@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import java.io.IOException;
@@ -13,56 +8,61 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import userDB.UserDAO;
-import userDB.UserDTO;
+import model.UserDAO;
+import model.UserDTO;
 
-@WebServlet(name = "LoginServlet", urlPatterns = { "/loginservlet" })
+@WebServlet(name = "LoginController", urlPatterns = { "/LoginController" })
 public class LoginController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request  servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException      if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-    }
+    private static final String LOGIN_PAGE = "login.jsp";
+    private static final String USER_HOME_PAGE = "user.jsp";
+    private static final String STAFF_DASHBOARD = "staff.jsp";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("login.jsp").forward(request, response);
+        request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+
         try {
             String user = request.getParameter("user");
             String pass = request.getParameter("pass");
 
             UserDAO dao = new UserDAO();
             UserDTO loginUser = dao.checkLogin(user, pass);
-            String ms = "";
+
             if (loginUser != null) {
-                ms = "Welcome " + user + "!";
-                request.setAttribute("success", ms);
-                request.getRequestDispatcher("listController").forward(request, response);
+                HttpSession session = request.getSession();
+                session.setAttribute("user", loginUser);
+                session.setAttribute("role", loginUser.getRoleID());
+
+                System.out.print(loginUser.getRoleID() + " Check log Role user! and check staff_ROLE: ");
+                System.out.println(UserDTO.STAFF_ROLE);
+                if (loginUser.getRoleID().equals(UserDTO.USER_ROLE)) { // Role 0: user
+                    response.sendRedirect(USER_HOME_PAGE);
+                } else if (loginUser.getRoleID().equals(UserDTO.STAFF_ROLE)) { // Role 2: staff
+                    response.sendRedirect(STAFF_DASHBOARD);
+                    System.out.println("staff");
+                } else {
+                    // Xử lý cho các role khác (nếu có) hoặc báo lỗi
+                    request.setAttribute("errorMessage", "Invalid role!");
+                    request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
+                }
             } else {
-                ms = "Invalid user or password!!!";
-                request.setAttribute("fail", ms);
-                request.getRequestDispatcher("login.jsp").forward(request, response);
+                request.setAttribute("errorMessage", "Invalid username or password!");
+                request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
             }
-        } catch (IOException | SQLException | ServletException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            log("Login Error: " + e.getMessage());
+            request.setAttribute("errorMessage", "Database error. Please try again later.");
+            request.getRequestDispatcher(LOGIN_PAGE).forward(request, response);
         }
     }
-
 }

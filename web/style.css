@@ -147,3 +147,18 @@ button:hover {
     margin-bottom: 10px;
     text-align: center;
 }
+
+
+.radio-option {
+    display: flex !important; /* Sử dụng flexbox để căn chỉnh các phần tử con */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    margin-right: 20px; 
+  }
+  
+  .radio-option input[type="radio"] {
+    margin-right: 5px; /* Tạo khoảng cách giữa radio button và label */
+  }
+  
+  .radio-option label { /* Thêm style cho label */
+    cursor: pointer; /* Biến label thành con trỏ khi di chuột qua */
+  }

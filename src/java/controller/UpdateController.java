@@ -1,50 +1,71 @@
 package controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import userDB.UserDAO;
-import userDB.UserDTO;
+import model.Mobile;
+import model.MobileDAO;
 
-@WebServlet(name = "UpdateController", urlPatterns = { "/UpdateController" })
+@WebServlet("/UpdateController")
 public class UpdateController extends HttpServlet {
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String userID = request.getParameter("userID");
-        String fullName = request.getParameter("fullName");
-        String roleID = request.getParameter("roleID");
-        String password = request.getParameter("password");
-
-        UserDTO user = new UserDTO(userID, fullName, roleID, password);
-        UserDAO dao = new UserDAO();
-
-        try {
-            boolean isUpdated = dao.update(user);
-            if (isUpdated) {
-                request.getRequestDispatcher("listController").forward(request, response);
-            } else {
-                request.getRequestDispatcher("errorPage.jsp").forward(request, response);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        // Kiểm tra session
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("role") == null || !session.getAttribute("role").equals("2")) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        String mobileId = request.getParameter("mobileId");
+        MobileDAO dao = new MobileDAO();
+        Mobile mobile = dao.getMobileById(mobileId); // Lấy thông tin sản phẩm cần sửa
+
+        if (mobile != null) {
+            request.setAttribute("mobile", mobile); // Đặt thuộc tính "mobile" vào request
+            request.getRequestDispatcher("editMobile.jsp").forward(request, response);
+        } else {
+            // Sản phẩm không tồn tại
+            request.setAttribute("errorMessage", "Sản phẩm không tồn tại.");
+            request.getRequestDispatcher("staff.jsp").forward(request, response);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        // Kiểm tra session (tương tự như doGet)
+
+        // Lấy thông tin cập nhật từ form
+        System.out.println("Check update with ID: " + request.getParameter("mobileId"));
+        String mobileId = request.getParameter("mobileId");
+        String mobileName = request.getParameter("mobileName");
+        String description = request.getParameter("description");
+        float price = Float.parseFloat(request.getParameter("price"));
+        int yearOfProduction = Integer.parseInt(request.getParameter("yearOfProduction"));
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        boolean notSale = request.getParameter("notSale") != null ? false : true; // Kiểm tra checkbox
+
+        Mobile updatedMobile = new Mobile(mobileId, description, price, mobileName, yearOfProduction, quantity,
+                notSale);
+        MobileDAO dao = new MobileDAO();
+        boolean isUpdated = dao.updateMobile(updatedMobile);
+
+        if (isUpdated) {
+            // Cập nhật thành công
+            response.sendRedirect("staff.jsp");
+        } else {
+            // Cập nhật thất bại
+            request.setAttribute("errorMessage", "Cập nhật sản phẩm thất bại.");
+            request.getRequestDispatcher("editMobile.jsp").forward(request, response);
+        }
     }
 }
